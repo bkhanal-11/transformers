@@ -1,7 +1,9 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Embedding, MultiHeadAttention, Dropout, LayerNormalization
+from tensorflow.keras.layers import Embedding, Dropout, LayerNormalization
 
 from utils import FullyConnected, positional_encoding
+from mha import MultiHeadAttention
+
 class EncoderLayer(tf.keras.layers.Layer):
     """
     The encoder layer is composed by a multi-head self-attention mechanism,
