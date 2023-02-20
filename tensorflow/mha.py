@@ -1,11 +1,10 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.layers import Dense
 import numpy as np
 
 class ScaledDotProductAttention(tf.keras.layers.Layer):
-    def __init__(self, dropout_prob, **kwargs):
+    def __init__(self, **kwargs):
         super(ScaledDotProductAttention, self).__init__(**kwargs)
-        self.dropout = Dropout(dropout_prob)
  
     def call(self, queries, keys, values, mask=None):
         matmul_qk = tf.matmul(queries, keys.T)
@@ -27,9 +26,9 @@ class ScaledDotProductAttention(tf.keras.layers.Layer):
 
 # Implementing the Multi-Head Attention
 class MultiHeadAttention(tf.keras.layers.Layer):
-    def __init__(self, h, d_k, d_v, d_model, dropout_prob, **kwargs):
+    def __init__(self, h, d_k, d_v, d_model, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
-        self.attention = ScaledDotProductAttention(dropout_prob)  # Scaled dot product attention
+        self.attention = ScaledDotProductAttention()  # Scaled dot product attention
         self.heads = h  # Number of attention heads to use
         self.d_k = d_k
         self.d_v = d_v
