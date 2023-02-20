@@ -24,7 +24,6 @@ class EncoderLayer(tf.keras.layers.Layer):
         self.layernorm1 = LayerNormalization(epsilon=layernorm_eps)
         self.layernorm2 = LayerNormalization(epsilon=layernorm_eps)
 
-        self.dropout_mha = Dropout(dropout_rate)
         self.dropout_ffn = Dropout(dropout_rate)
     
     def call(self, x, training, mask):
@@ -42,7 +41,6 @@ class EncoderLayer(tf.keras.layers.Layer):
         """
         # calculate Self-Attention using Multi-Head Attention
         self_mha_output = self.mha(x, x, x, mask)  # Self attention (batch_size, input_seq_len, fully_connected_dim)
-        self.mha_output = self.dropout_mha(self_mha_output)
         
         # skip connection
         # apply layer normalization on sum of the input and the attention output to get the output of the multi-head attention layer

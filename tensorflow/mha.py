@@ -1,10 +1,12 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Dropout
+
 import numpy as np
 
 class ScaledDotProductAttention(tf.keras.layers.Layer):
-    def __init__(self, **kwargs):
+    def __init__(self, dropout,  **kwargs):
         super(ScaledDotProductAttention, self).__init__(**kwargs)
+        self.dropout = Dropout(dropout)
  
     def call(self, queries, keys, values, mask=None):
         matmul_qk = tf.matmul(queries, keys.T)
@@ -18,17 +20,17 @@ class ScaledDotProductAttention(tf.keras.layers.Layer):
 
         # softmax is normalized on the last axis (seq_len_k) so that the scores add up to 1.
         attention_weights = tf.keras.activations.softmax(scaled_attention_logits, axis=-1)
-        attention_weights = self.dropout(attention_weights)
+        attention_weights_dropout = self.dropout(attention_weights)
 
-        output = tf.matmul(attention_weights, values)  # (..., seq_len_q, depth_v)
+        output = tf.matmul(attention_weights_dropout, values)  # (..., seq_len_q, depth_v)
 
         return output, attention_weights
 
 # Implementing the Multi-Head Attention
 class MultiHeadAttention(tf.keras.layers.Layer):
-    def __init__(self, h, d_k, d_v, d_model, **kwargs):
+    def __init__(self, h, d_k, d_v, d_model, dropout, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
-        self.attention = ScaledDotProductAttention()  # Scaled dot product attention
+        self.attention = ScaledDotProductAttention(dropout)  # Scaled dot product attention
         self.heads = h  # Number of attention heads to use
         self.d_k = d_k
         self.d_v = d_v
@@ -59,7 +61,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         v_reshaped = self.reshape_tensor(self.W_v(values), self.heads, True)
  
         # Compute the multi-head attention output using the reshaped queries, keys and values
-        o_reshaped, _ = self.attention(q_reshaped, k_reshaped, v_reshaped, mask, self.dropout_prob)
+        o_reshaped, _ = self.attention(q_reshaped, k_reshaped, v_reshaped, mask)
  
         # Rearrange back the output into concatenated form
         # Resulting tensor shape: (batch_size, input_seq_length, d_v)
