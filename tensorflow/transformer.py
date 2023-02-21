@@ -62,6 +62,7 @@ class Transformer(tf.keras.Model):
         
         """
         x = tf.matmul(input_sentence, self.embedding)
+        print(self.embedding.shape)
         x = x + self.positional_encoding
         x =  self.dropout_encoding_input(x, training=training)
         # call self.encoder with the appropriate arguments to get the encoder output

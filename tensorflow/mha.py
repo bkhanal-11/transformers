@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.layers import Dropout
 
 import numpy as np
 
@@ -33,7 +33,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         self.attention = ScaledDotProductAttention(dropout)  # Scaled dot product attention
         self.heads = num_heads  # Number of attention heads to use
         self.key_dim = key_dim
-        self.value_dim = key_dim
+        self.value_dim = value_dim
         self.d_model = d_model
 
         initializer = tf.keras.initializers.GlorotUniform()
