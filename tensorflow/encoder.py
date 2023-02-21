@@ -11,12 +11,14 @@ class EncoderLayer(tf.keras.layers.Layer):
     This archirecture includes a residual connection around each of the two 
     sub-layers, followed by layer normalization.
     """
-    def __init__(self, embedding_dim, num_heads, fully_connected_dim,
+    def __init__(self, embedding_dim, num_heads, d_model, fully_connected_dim,
                  dropout_rate=0.1, layernorm_eps=1e-6):
         super(EncoderLayer, self).__init__()
 
         self.mha = MultiHeadAttention(num_heads=num_heads,
-                                      key_dim=embedding_dim)
+                                      key_dim=embedding_dim,
+                                      d_model=d_model,
+                                      dropout=dropout_rate)
 
         self.ffn = FullyConnected(embedding_dim=embedding_dim,
                                   fully_connected_dim=fully_connected_dim)
@@ -64,7 +66,7 @@ class Encoder(tf.keras.layers.Layer):
     encoder Layers
         
     """  
-    def __init__(self, num_layers, embedding_dim, num_heads, fully_connected_dim, input_vocab_size,
+    def __init__(self, num_layers, embedding_dim, num_heads, d_model, fully_connected_dim, input_vocab_size,
                maximum_position_encoding, dropout_rate=0.1, layernorm_eps=1e-6):
         super(Encoder, self).__init__()
 
@@ -78,6 +80,7 @@ class Encoder(tf.keras.layers.Layer):
 
         self.enc_layers = [EncoderLayer(embedding_dim=self.embedding_dim,
                                         num_heads=num_heads,
+                                        d_model=d_model,
                                         fully_connected_dim=fully_connected_dim,
                                         dropout_rate=dropout_rate,
                                         layernorm_eps=layernorm_eps) 
@@ -117,3 +120,4 @@ class Encoder(tf.keras.layers.Layer):
             x = self.enc_layers[i](x, training, mask)
 
         return x
+    

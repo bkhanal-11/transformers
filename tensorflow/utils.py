@@ -36,6 +36,35 @@ def positional_encoding(positions, d):
     
     return tf.cast(pos_encoding, dtype=tf.float32)
 
+def create_padding_mask(decoder_token_ids):
+    """
+    Creates a matrix mask for the padding cells
+    
+    Arguments:
+        decoder_token_ids -- (n, m) matrix
+    
+    Returns:
+        mask -- (n, 1, m) binary tensor
+    """    
+    seq = 1 - tf.cast(tf.math.equal(decoder_token_ids, 0), tf.float32)
+  
+    # add extra dimensions to add the padding to the attention logits.
+    return seq[:, tf.newaxis, :] 
+
+def create_look_ahead_mask(sequence_length):
+    """
+    Returns a lower triangular matrix filled with ones
+    
+    Arguments:
+        sequence_length -- matrix size
+    
+    Returns:
+        mask -- (size, size) tensor
+    """
+    mask = tf.linalg.band_part(tf.ones((1, sequence_length, sequence_length)), -1, 0)
+    
+    return mask 
+
 class CustomLRScheduler(tf.keras.optimizers.schedules.LearningRateSchedule):
     """
     Custom learning rate for Adam optimizer as suggested in the paper
@@ -84,4 +113,4 @@ def masked_accuracy(label, pred):
  
     match = tf.cast(match, dtype=tf.float32)
     mask = tf.cast(mask, dtype=tf.float32)
-    return tf.reduce_sum(match)/tf.reduce_sum(mask)
+    return tf.reduce_sum(match) / tf.reduce_sum(mask)

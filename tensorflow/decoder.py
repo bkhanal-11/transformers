@@ -1,7 +1,8 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Embedding, MultiHeadAttention, Dropout, LayerNormalization
+from tensorflow.keras.layers import Embedding, Dropout, LayerNormalization
 
 from utils import FullyConnected, positional_encoding
+from mha import MultiHeadAttention
 
 class DecoderLayer(tf.keras.layers.Layer):
     """
@@ -10,15 +11,17 @@ class DecoderLayer(tf.keras.layers.Layer):
     one that combines it with the output of the encoder, followed by a
     fully connected block. 
     """
-    def __init__(self, embedding_dim, num_heads, fully_connected_dim, dropout_rate=0.1, layernorm_eps=1e-6):
+    def __init__(self, embedding_dim, num_heads, d_model, fully_connected_dim, dropout_rate=0.1, layernorm_eps=1e-6):
         super(DecoderLayer, self).__init__()
 
         self.mha1 = MultiHeadAttention(num_heads=num_heads,
                                       key_dim=embedding_dim,
+                                      d_model=d_model,
                                       dropout=dropout_rate)
 
         self.mha2 = MultiHeadAttention(num_heads=num_heads,
                                       key_dim=embedding_dim,
+                                      d_model=d_model,
                                       dropout=dropout_rate)
 
         self.ffn = FullyConnected(embedding_dim=embedding_dim,
@@ -81,7 +84,7 @@ class Decoder(tf.keras.layers.Layer):
     decoder Layers
         
     """ 
-    def __init__(self, num_layers, embedding_dim, num_heads, fully_connected_dim, target_vocab_size,
+    def __init__(self, num_layers, embedding_dim, num_heads, d_model, fully_connected_dim, target_vocab_size,
                maximum_position_encoding, dropout_rate=0.1, layernorm_eps=1e-6):
         super(Decoder, self).__init__()
 
@@ -93,14 +96,14 @@ class Decoder(tf.keras.layers.Layer):
 
         self.dec_layers = [DecoderLayer(embedding_dim=self.embedding_dim,
                                         num_heads=num_heads,
+                                        d_model=d_model,
                                         fully_connected_dim=fully_connected_dim,
                                         dropout_rate=dropout_rate,
                                         layernorm_eps=layernorm_eps) 
                            for _ in range(self.num_layers)]
         self.dropout = Dropout(dropout_rate)
     
-    def call(self, x, enc_output, training, 
-           look_ahead_mask, padding_mask):
+    def call(self, x, enc_output, training, look_ahead_mask, padding_mask):
         """
         Forward  pass for the Decoder
         
@@ -142,3 +145,4 @@ class Decoder(tf.keras.layers.Layer):
             attention_weights['decoder_layer{}_block2_decenc_att'.format(i+1)] = block2
 
         return x, attention_weights
+    
