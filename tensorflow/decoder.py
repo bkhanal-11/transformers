@@ -1,7 +1,7 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Embedding, Dropout, LayerNormalization
+from tensorflow.keras.layers import Dropout, LayerNormalization
 
-from utils import FullyConnected, positional_encoding
+from utils import FullyConnected
 from mha import MultiHeadAttention
 
 class DecoderLayer(tf.keras.layers.Layer):
@@ -11,20 +11,23 @@ class DecoderLayer(tf.keras.layers.Layer):
     one that combines it with the output of the encoder, followed by a
     fully connected block. 
     """
-    def __init__(self, embedding_dim, num_heads, d_model, fully_connected_dim, dropout_rate=0.1, layernorm_eps=1e-6):
+    def __init__(self, num_heads, d_model, embedding_dim, value_dim, fully_connected_dim,
+                  dropout_rate=0.1, layernorm_eps=1e-6):
         super(DecoderLayer, self).__init__()
 
         self.mha1 = MultiHeadAttention(num_heads=num_heads,
-                                      key_dim=embedding_dim,
                                       d_model=d_model,
+                                      key_dim=embedding_dim,
+                                      value_dim=value_dim,
                                       dropout=dropout_rate)
 
         self.mha2 = MultiHeadAttention(num_heads=num_heads,
-                                      key_dim=embedding_dim,
                                       d_model=d_model,
+                                      key_dim=embedding_dim,
+                                      value_dim=value_dim,
                                       dropout=dropout_rate)
 
-        self.ffn = FullyConnected(embedding_dim=embedding_dim,
+        self.ffn = FullyConnected(embedding_dim=d_model,
                                   fully_connected_dim=fully_connected_dim)
 
         self.layernorm1 = LayerNormalization(epsilon=layernorm_eps)
@@ -84,19 +87,17 @@ class Decoder(tf.keras.layers.Layer):
     decoder Layers
         
     """ 
-    def __init__(self, num_layers, embedding_dim, num_heads, d_model, fully_connected_dim, target_vocab_size,
-               maximum_position_encoding, dropout_rate=0.1, layernorm_eps=1e-6):
+    def __init__(self, num_layers, num_heads, d_model, embedding_dim, value_dim, fully_connected_dim,
+                 dropout_rate=0.1, layernorm_eps=1e-6):
         super(Decoder, self).__init__()
 
         self.embedding_dim = embedding_dim
         self.num_layers = num_layers
 
-        self.embedding = Embedding(target_vocab_size, self.embedding_dim)
-        self.pos_encoding = positional_encoding(maximum_position_encoding, self.embedding_dim)
-
-        self.dec_layers = [DecoderLayer(embedding_dim=self.embedding_dim,
-                                        num_heads=num_heads,
+        self.dec_layers = [DecoderLayer(num_heads=num_heads,
                                         d_model=d_model,
+                                        embedding_dim=self.embedding_dim,
+                                        value_dim=value_dim,
                                         fully_connected_dim=fully_connected_dim,
                                         dropout_rate=dropout_rate,
                                         layernorm_eps=layernorm_eps) 
@@ -119,20 +120,7 @@ class Decoder(tf.keras.layers.Layer):
             attention_weights - Dictionary of tensors containing all the attention weights
                                 each of shape Tensor of shape (batch_size, num_heads, target_seq_len, input_seq_len)
         """
-        seq_len = tf.shape(x)[1]
         attention_weights = {}
-
-        # create word embeddings 
-        x = self.embedding(x)  # (batch_size, target_seq_len, fully_connected_dim)
-        
-        # scale embeddings by multiplying by the square root of their dimension
-        x *= tf.sqrt(tf.cast(self.embedding_dim, tf.float32))
-        
-        # calculate positional encodings and add to word embedding
-        x += self.pos_encoding[:, :seq_len, :]
-
-        # apply a dropout layer to x
-        x = self.dropout(x, training=training)
 
         # use a for loop to pass x through a stack of decoder layers and update attention_weights
         for i in range(self.num_layers):

@@ -8,7 +8,9 @@ Keys, Queries and Values in Attention Mechanism: ![What exactly are keys, querie
 
 Positional Encoding: ![Transformer Architecture: The Positional Encoding](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
 
-Data Flow, Parameters, and Dimensions in Transformer: ![Into The Transformer](https://towardsdatascience.com/into-the-transformer-5ad892e0cee)
+Data Flow, Parameters, and Dimensions in Transformer: ![Into The Transformer](https://towardsdatascience.com/into-the-transformer-5ad892e0cee) ![Transformers: report on Attention Is All You Need](https://www.kaggle.com/code/samuelnordmann/transformers-report-on-attention-is-all-you-need/notebook)
+
+
 
 The Transformer architecture is a popular type of neural network used in natural language processing (NLP) tasks, such as machine translation and text classification. It was first introduced in a paper by Vaswani et al. in 2017.
 
