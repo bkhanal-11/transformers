@@ -1,14 +1,14 @@
 # Attention is All You Need
 
-The implementation of transformer as presented in the paper !["Attention is all you need"](https://arxiv.org/abs/1706.03762) from scratch.
+The implementation of transformer as presented in the paper ["Attention is all you need"](https://arxiv.org/abs/1706.03762) from scratch.
 
-Excellent Illustration of Transformers: ![Illustrated Guide to Transformers Neural Network: A step by step explanation](https://www.youtube.com/watch?v=4Bdc55j80l8)
+Excellent Illustration of Transformers: [Illustrated Guide to Transformers Neural Network: A step by step explanation](https://www.youtube.com/watch?v=4Bdc55j80l8)
 
-Keys, Queries and Values in Attention Mechanism: ![What exactly are keys, queries, and values in attention mechanisms?](https://stats.stackexchange.com/questions/421935/what-exactly-are-keys-queries-and-values-in-attention-mechanisms#424127)
+Keys, Queries and Values in Attention Mechanism: [What exactly are keys, queries, and values in attention mechanisms?](https://stats.stackexchange.com/questions/421935/what-exactly-are-keys-queries-and-values-in-attention-mechanisms#424127)
 
-Positional Encoding: ![Transformer Architecture: The Positional Encoding](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
+Positional Encoding: [Transformer Architecture: The Positional Encoding](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
 
-Data Flow, Parameters, and Dimensions in Transformer: ![Into The Transformer](https://towardsdatascience.com/into-the-transformer-5ad892e0cee), ![Transformers: report on Attention Is All You Need](https://www.kaggle.com/code/samuelnordmann/transformers-report-on-attention-is-all-you-need/notebook)
+Data Flow, Parameters, and Dimensions in Transformer: [Into The Transformer](https://towardsdatascience.com/into-the-transformer-5ad892e0cee), [Transformers: report on Attention Is All You Need](https://www.kaggle.com/code/samuelnordmann/transformers-report-on-attention-is-all-you-need/notebook)
 
 
 
