@@ -71,8 +71,13 @@ input_vocab_size, max_positioning_embedding = 29, 11
 batch_size = 3
 
 
-transformer = Transformer(num_layers=num_layers, num_heads=num_heads, d_model=d_model, embedding_dim=embedding_dim,
-                        fully_connected_dim=fully_connected_dim, input_vocab_size=input_vocab_size, max_positional_encoding_input=max_positioning_embedding)
+transformer = Transformer(num_layers=num_layers, 
+                          num_heads=num_heads, 
+                          d_model=d_model, 
+                          embedding_dim=embedding_dim,
+                        fully_connected_dim=fully_connected_dim, 
+                        input_vocab_size=input_vocab_size, 
+                        max_positional_encoding_input=max_positioning_embedding)
 
 input_shape = (None, max_positioning_embedding, input_vocab_size)
 

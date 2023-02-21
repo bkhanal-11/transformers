@@ -6,9 +6,15 @@ Excellent Illustration of Transformers: ![Illustrated Guide to Transformers Neur
 
 Keys, Queries and Values in Attention Mechanism: ![What exactly are keys, queries, and values in attention mechanisms?](https://stats.stackexchange.com/questions/421935/what-exactly-are-keys-queries-and-values-in-attention-mechanisms#424127)
 
+Positional Encoding: ![Transformer Architecture: The Positional Encoding](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
+
+Data Flow, Parameters, and Dimensions in Transformer: ![Into The Transformer](https://towardsdatascience.com/into-the-transformer-5ad892e0cee)
+
 The Transformer architecture is a popular type of neural network used in natural language processing (NLP) tasks, such as machine translation and text classification. It was first introduced in a paper by Vaswani et al. in 2017.
 
 At a high level, the Transformer model consists of an encoder and a decoder, both of which contain a series of identical layers. Each layer has two sub-layers: a self-attention layer and a feedforward layer. The self-attention layer allows the model to attend to different parts of the input sequence, while the feedforward layer applies a non-linear transformation to the output of the self-attention layer.
+
+![Architecture](assets/architecture.png)
 
 Now, let's break down the math behind the self-attention layer. Suppose we have an input sequence of length $N$, represented as a matrix $X$, where each row corresponds to a word embedding. We want to compute a new sequence of vectors $Z$, where each vector is a weighted sum of all the input vectors:
 
@@ -39,5 +45,7 @@ Z = \text{Attention}(Q, K, V) W_o
 $$
 
 where $W_o$ is another learned weight matrix. The output of the self-attention layer is then passed through a feedforward layer with a ReLU activation function, and the process is repeated for each layer in the encoder and decoder.
+
+![Multi-Head Attention](assets/mha.png)
 
 Overall, the Transformer architecture is a powerful tool for NLP tasks, and its self-attention mechanism allows it to model long-range dependencies in the input sequence.

@@ -9,9 +9,9 @@ class ScaledDotProductAttention(tf.keras.layers.Layer):
         self.dropout = Dropout(dropout)
  
     def call(self, queries, keys, values, mask=None):
-        matmul_qk = tf.matmul(queries, keys.T)
+        matmul_qk = tf.matmul(queries, keys, transpose_b=True)
 
-        dk = keys.shape[0]
+        dk = tf.cast(tf.shape(keys)[-1], tf.float32)
         scaled_attention_logits = tf.divide(matmul_qk, np.sqrt(dk))
 
         # add the mask to the scaled tensor.
@@ -33,7 +33,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         self.attention = ScaledDotProductAttention(dropout)  # Scaled dot product attention
         self.heads = num_heads  # Number of attention heads to use
         self.key_dim = key_dim
-        self.value_dim = value_dim if value_dim else key_dim
+        self.value_dim = key_dim
         self.d_model = d_model
         self.W_q = Dense(key_dim)
         self.W_k = Dense(key_dim)
@@ -42,7 +42,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
  
     def reshape_tensor(self, x, heads, flag):
         if flag:
-            # Tensor shape after reshaping and transposing: (batch_size, heads, seq_length, -1)
+            # Tensor shape after reshaping and transposing: (batch_size, heads,     , -1)
             x = tf.reshape(x, shape=(tf.shape(x)[0], tf.shape(x)[1], heads, -1))
             x = tf.transpose(x, perm=(0, 2, 1, 3))
         else:
