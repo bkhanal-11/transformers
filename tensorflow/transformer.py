@@ -14,7 +14,7 @@ class Transformer(tf.keras.Model):
                  max_positional_encoding, dropout_rate=0.1, layernorm_eps=1e-6):
         super(Transformer, self).__init__()
 
-        initializer = tf.keras.initializers.GlorotUniform()
+        initializer = tf.keras.initializers.GlorotUniform(seed=3)
         self.embedding = tf.Variable(initializer(shape=(input_vocab_size, d_model)), trainable=True)
         self.positional_encoding = positional_encoding(max_positional_encoding, d_model)
         
@@ -62,7 +62,6 @@ class Transformer(tf.keras.Model):
         
         """
         x = tf.matmul(input_sentence, self.embedding)
-        print(self.embedding.shape)
         x = x + self.positional_encoding
         x =  self.dropout_encoding_input(x, training=training)
         # call self.encoder with the appropriate arguments to get the encoder output

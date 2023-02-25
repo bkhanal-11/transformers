@@ -36,7 +36,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         self.value_dim = value_dim
         self.d_model = d_model
 
-        initializer = tf.keras.initializers.GlorotUniform()
+        initializer = tf.keras.initializers.GlorotUniform(seed=3)
         self.W_q = tf.Variable(initializer(shape=(num_heads, d_model, key_dim)), trainable=True)
         self.W_k = tf.Variable(initializer(shape=(num_heads, d_model, key_dim)), trainable=True)
         self.W_v = tf.Variable(initializer(shape=(num_heads, d_model, value_dim)), trainable=True)
