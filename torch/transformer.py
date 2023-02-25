@@ -14,7 +14,7 @@ class Transformer(nn.Module):
 
         self.final_layer = nn.Linear(d_model, target_vocab_size)
 
-    def forward(self, inp, tar, look_ahead_mask=None, dec_padding_mask=None, enc_padding_mask=None):
+    def forward(self, inp, tar, enc_padding_mask=None, look_ahead_mask=None, dec_padding_mask=None):
         enc_output = self.encoder(inp, enc_padding_mask)
 
         dec_output, attention_weights = self.decoder(tar, enc_output, look_ahead_mask, dec_padding_mask)

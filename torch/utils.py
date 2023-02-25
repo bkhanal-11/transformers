@@ -43,10 +43,11 @@ def create_padding_mask(decoder_token_ids):
     Returns:
         mask -- (n, 1, m) binary tensor
     """
+    # Create a matrix mask for the padding cells
     seq = 1 - torch.eq(decoder_token_ids, 0).float()
   
-    # add extra dimensions to add the padding to the attention logits.
-    return seq.unsqueeze(1)
+    # Add extra dimensions to add the padding to the attention logits
+    return seq.unsqueeze(1).unsqueeze(2)
 
 def create_look_ahead_mask(sequence_length):
     """
@@ -58,6 +59,7 @@ def create_look_ahead_mask(sequence_length):
     Returns:
         mask -- (size, size) tensor
     """
+    # Create a lower triangular matrix filled with ones
     mask = torch.tril(torch.ones(sequence_length, sequence_length))
     
     return mask
