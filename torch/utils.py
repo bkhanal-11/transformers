@@ -10,33 +10,27 @@ def FullyConnected(embedding_dim, fully_connected_dim):
         nn.Linear(fully_connected_dim, embedding_dim)
     )
 
-
-class PositionalEmbedding(nn.Module):
-    def __init__(self, max_seq_len, d_model):
-        """
-        Args:
-            max_seq_len: length of input sequence
-            d_model: demension of embedding
-        """
-        super(PositionalEmbedding, self).__init__()
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_seq_len=5000):
+        super(PositionalEncoding, self).__init__()
         self.d_model = d_model
+        self.pe = self.get_positional_encoding(max_seq_len)
 
-        PE = torch.zeros(max_seq_len, self.d_model)
-        for pos in range(max_seq_len):
-            for i in range(0, self.d_model, 2):
-                PE[pos, i] = math.sin(pos / (10000 ** ((2 * i)/self.d_model)))
-                PE[pos, i + 1] = math.cos(pos / (10000 ** ((2 * (i + 1))/self.d_model)))
-        PE = PE.unsqueeze(0)
-        self.register_buffer('PE', PE)
-
+    def get_positional_encoding(self, max_seq_len):
+        # Generate positional encoding matrix
+        pe = torch.zeros(max_seq_len, self.d_model)
+        position = torch.arange(0, max_seq_len, dtype=torch.float32).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, self.d_model, 2, dtype=torch.float32) * (-math.log(10000.0) / self.d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0)
+        return pe
 
     def forward(self, x):
-        # make embeddings relatively larger
-        x = x * math.sqrt(self.d_model)
-        #add constant to embedding
         seq_len = x.size(1)
-        x = x + torch.autograd.Variable(self.PE[:,:seq_len], requires_grad=False)
-        
+        pe = self.pe[:, :seq_len, :]
+        x = x * math.sqrt(self.d_model)
+        x = x + pe
         return x
 
 def create_padding_mask(decoder_token_ids):
