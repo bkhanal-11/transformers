@@ -71,8 +71,6 @@ class DecoderLayer(nn.Module):
 
         return decoder_layer_out, attn_weights_block1, attn_weights_block2
 
-import torch.nn as nn
-
 class Decoder(nn.Module):
     """
     The Decoder consists of N layers of DecoderLayer.
