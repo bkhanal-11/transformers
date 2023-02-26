@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
-import math
 
-from utils import PositionalEncoding, FullyConnected
+from utils import PositionalEncoding, FullyConnected, LayerNorm
 from mha import MultiHeadAttention
 
 class DecoderLayer(nn.Module):
@@ -28,9 +27,9 @@ class DecoderLayer(nn.Module):
         self.ffn = FullyConnected(embedding_dim=d_model,
                                   fully_connected_dim=fully_connected_dim)
 
-        self.layernorm1 = nn.LayerNorm(d_model, eps=layernorm_eps)
-        self.layernorm2 = nn.LayerNorm(d_model, eps=layernorm_eps)
-        self.layernorm3 = nn.LayerNorm(d_model, eps=layernorm_eps)
+        self.layernorm1 = LayerNorm(d_model, eps=layernorm_eps)
+        self.layernorm2 = LayerNorm(d_model, eps=layernorm_eps)
+        self.layernorm3 = LayerNorm(d_model, eps=layernorm_eps)
 
         self.dropout_ffn = nn.Dropout(dropout_rate)
 
@@ -119,7 +118,7 @@ class Decoder(nn.Module):
         
         for i in range(self.num_layers):
             x, attn_wt_1,  attn_wt_2 = self.decoder_layers[i](x, enc_output, look_ahead_mask, padding_mask)
-            attention_weights[f'decoder_layer_{i+1}'] = attn_wt_1
-            # attention_weights[f'decoder_layer_{i+1}'] = attn_wt_2
+            attention_weights[f"decoder_layer{i + 1}_block1_self_att"] = attn_wt_1
+            attention_weights[f"decoder_layer{i + 1}_block2_decenc_att"] = attn_wt_2
         
         return x, attention_weights

@@ -1,14 +1,34 @@
 import torch
 import torch.nn as nn
-import numpy as np
 import math
 
-def FullyConnected(embedding_dim, fully_connected_dim):
-    return nn.Sequential(
-        nn.Linear(embedding_dim, fully_connected_dim),
-        nn.ReLU(),
-        nn.Linear(fully_connected_dim, embedding_dim)
-    )
+class FullyConnected(nn.Module):
+    def __init__(self, embedding_dim, fully_connected_dim):
+        super(FullyConnected, self).__init__()
+        self.fc1 = nn.Linear(embedding_dim, fully_connected_dim)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(fully_connected_dim, embedding_dim)
+
+    def forward(self, x):
+        x = self.relu(self.fc1(x))
+        
+        return self.fc2(x)
+
+class LayerNorm(torch.nn.Module):
+    def __init__(self, hidden_size, eps=1e-6):
+        super(LayerNorm, self).__init__()
+        self.hidden_size = hidden_size
+        self.eps = eps
+        
+        self.scale = torch.nn.Parameter(torch.ones(self.hidden_size))
+        self.bias = torch.nn.Parameter(torch.zeros(self.hidden_size))
+
+    def forward(self, x):
+        mean = x.mean(-1, keepdim=True)
+        std = x.std(-1, keepdim=True)
+        normalized = (x - mean) / (std + self.eps)
+        
+        return self.scale * normalized + self.bias
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_seq_len=5000):
@@ -24,6 +44,7 @@ class PositionalEncoding(nn.Module):
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
         pe = pe.unsqueeze(0)
+        
         return pe
 
     def forward(self, x):
@@ -31,6 +52,7 @@ class PositionalEncoding(nn.Module):
         pe = self.pe[:, :seq_len, :]
         x = x * math.sqrt(self.d_model)
         x = x + pe
+        
         return x
 
 def create_padding_mask(decoder_token_ids):

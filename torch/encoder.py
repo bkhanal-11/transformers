@@ -1,7 +1,7 @@
 import torch.nn as nn
 import math
 
-from utils import PositionalEncoding, FullyConnected
+from utils import PositionalEncoding, FullyConnected, LayerNorm
 from mha import MultiHeadAttention
 
 class EncoderLayer(nn.Module):
@@ -22,8 +22,8 @@ class EncoderLayer(nn.Module):
         self.ffn = FullyConnected(embedding_dim=d_model,
                                   fully_connected_dim=fully_connected_dim)
 
-        self.layernorm1 = nn.LayerNorm(d_model, eps=layernorm_eps)
-        self.layernorm2 = nn.LayerNorm(d_model, eps=layernorm_eps)
+        self.layernorm1 = LayerNorm(d_model, eps=layernorm_eps)
+        self.layernorm2 = LayerNorm(d_model, eps=layernorm_eps)
 
         self.dropout_ffn = nn.Dropout(dropout_rate)
 
@@ -38,15 +38,12 @@ class EncoderLayer(nn.Module):
         Returns:
             encoder_layer_out -- Tensor of shape (batch_size, input_seq_len, d_model)
         """
-        # apply layer normalization on sum of the input and the positional encoding
-        x = self.layernorm1(x)
-
         # calculate Self-Attention using Multi-Head Attention
         mha_output, _ = self.mha(x, x, x, mask)  # Self attention (batch_size, input_seq_len, d_model)
 
         # skip connection
         # apply layer normalization on sum of the input and the attention output to get the output of the multi-head attention layer
-        skip_x_attention = self.layernorm2(x + mha_output)
+        skip_x_attention = self.layernorm1(x + mha_output)
 
         # pass the output of the multi-head attention layer through a ffn
         ffn_output = self.ffn(skip_x_attention)
@@ -55,7 +52,7 @@ class EncoderLayer(nn.Module):
         ffn_output = self.dropout_ffn(ffn_output)
 
         # apply layer normalization on sum of the output from multi-head attention (skip connection) and ffn output to get the output of the encoder layer
-        encoder_layer_out = skip_x_attention + ffn_output
+        encoder_layer_out = self.layernorm2(skip_x_attention + ffn_output)
 
         return encoder_layer_out
 
