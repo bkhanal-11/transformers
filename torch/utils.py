@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import math
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 class FullyConnected(nn.Module):
     def __init__(self, embedding_dim, fully_connected_dim):
         super(FullyConnected, self).__init__()
@@ -45,7 +47,7 @@ class PositionalEncoding(nn.Module):
         pe[:, 1::2] = torch.cos(position * div_term)
         pe = pe.unsqueeze(0)
         
-        return pe
+        return pe.to(device)
 
     def forward(self, x):
         seq_len = x.size(1)
